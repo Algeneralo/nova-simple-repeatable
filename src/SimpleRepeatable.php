@@ -22,7 +22,7 @@ class SimpleRepeatable extends Field
 
     public $component = 'simple-repeatable';
 
-    protected $fields = [];
+    public $fields = [];
     protected $rows = [];
 
     public function __construct($name, $attribute = null, $fields = [])
