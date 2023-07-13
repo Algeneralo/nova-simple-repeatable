@@ -181,6 +181,7 @@ export default {
     },
 
     addRow() {
+      console.log('works')
       this.rows.push(this.copyFields(this.field.fields, this.rows.length));
     },
 
