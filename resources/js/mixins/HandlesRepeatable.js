@@ -52,9 +52,15 @@ export default {
         if (field.component === 'translatable-field') {
           formattedLocales = this.getFieldLocales(field);
         }
-
+       let dependsOn= field.dependsOn
+            ? Object.entries(field.dependsOn).reduce((acc, [key, value]) => {
+              acc[`${this.field.attribute}---${key}---${rowIndex}`] = value;
+              return acc;
+            }, {})
+            : {};
         return {
           ...field,
+           dependsOn: dependsOn,
           originalAttribute: field.attribute,
           validationKey: uniqueAttribute,
           attribute: uniqueAttribute,

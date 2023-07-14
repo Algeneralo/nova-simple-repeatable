@@ -1,18 +1,18 @@
 <template>
   <DefaultField
-    :field="currentField"
-    :errors="errors"
-    :show-help-text="showHelpText"
-    class="simple-repeatable form-field"
+      :field="currentField"
+      :errors="errors"
+      :show-help-text="showHelpText"
+      class="simple-repeatable form-field"
   >
     <template #field>
       <div class="flex flex-col" v-bind="extraAttributes">
         <!-- Title columns -->
         <div v-if="rows.length" class="nsr-w-full nsr-flex nsr-border-b nsr-py-2 dark:nsr-border-slate-600">
           <div
-            v-for="(rowField, i) in fields"
-            :key="i"
-            class="nsr-font-bold nsr-text-90 nsr-text-md nsr-w-full nsr-ml-3 nsr-flex"
+              v-for="(rowField, i) in fields"
+              :key="i"
+              class="nsr-font-bold nsr-text-90 nsr-text-md nsr-w-full nsr-ml-3 nsr-flex"
           >
             {{ rowField.name }}
             <span v-if="rowField.required" class="nsr-text-red-500 nsr-text-sm nsr-pl-1">
@@ -21,60 +21,62 @@
 
             <!--  If field is nova-translatable, render separate locale-tabs   -->
             <nova-translatable-locale-tabs
-              style="padding: 0"
-              class="nsr-ml-auto"
-              v-if="rowField.component === 'translatable-field'"
-              :locales="rowField.formattedLocales"
-              :display-type="rowField.translatable.display_type"
-              :active-locale="activeLocales[i] || rowField.formattedLocales[0].key"
-              :locales-with-errors="repeatableValidation.locales[rowField.originalAttribute]"
-              @tabClick="locale => setAllLocales(`sr-${field.attribute}-${rowField.originalAttribute}`, locale)"
-              @doubleClick="locale => setAllLocales(void 0, locale)"
+                style="padding: 0"
+                class="nsr-ml-auto"
+                v-if="rowField.component === 'translatable-field'"
+                :locales="rowField.formattedLocales"
+                :display-type="rowField.translatable.display_type"
+                :active-locale="activeLocales[i] || rowField.formattedLocales[0].key"
+                :locales-with-errors="repeatableValidation.locales[rowField.originalAttribute]"
+                @tabClick="locale => setAllLocales(`sr-${field.attribute}-${rowField.originalAttribute}`, locale)"
+                @doubleClick="locale => setAllLocales(void 0, locale)"
             />
           </div>
         </div>
 
         <draggable
-          v-model="rows"
-          :item-key="(el, i) => (el && el[0] && el[0].attribute) || i"
-          handle=".vue-draggable-handle"
+            v-model="rows"
+            :item-key="(el, i) => (el && el[0] && el[0].attribute) || i"
+            handle=".vue-draggable-handle"
         >
           <template #item="{ element, index }">
             <div class="simple-repeatable-row nsr-flex nsr-py-3 nsr-pl-3 nsr-relative nsr-rounded-md">
               <div class="vue-draggable-handle nsr-flex nsr-justify-center nsr-items-center nsr-cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" class="fill-current">
                   <path
-                    d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
+                      d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
                   />
                 </svg>
               </div>
 
               <div class="simple-repeatable-fields-wrapper nsr-w-full nsr-flex">
                 <component
-                  v-for="(rowField, j) in element"
-                  :key="j"
-                  :is="`form-${rowField.component}`"
-                  :field="rowField"
-                  :errors="repeatableValidation.errors"
-                  :unique-id="getUniqueId(field, rowField)"
-                  class="nsr-mr-3"
+                    v-for="(rowField, j) in element"
+                    :key="j"
+                    :is="`form-${rowField.component}`"
+                    :field="rowField"
+                    :errors="repeatableValidation.errors"
+                    :unique-id="getUniqueId(field, rowField)"
+                    :resource-id="resourceId"
+                    :resource-name="resourceName"
+                    class="nsr-mr-3"
                 />
               </div>
 
               <div
-                class="delete-icon nsr-flex nsr-justify-center nsr-items-center nsr-cursor-pointer nsr-fill-current hover:nsr-fill-red-600"
-                @click="deleteRow(index)"
-                v-if="canDeleteRows"
+                  class="delete-icon nsr-flex nsr-justify-center nsr-items-center nsr-cursor-pointer nsr-fill-current hover:nsr-fill-red-600"
+                  @click="deleteRow(index)"
+                  v-if="canDeleteRows"
               >
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  class="nsr-fill-inherit"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    class="nsr-fill-inherit"
                 >
                   <path
-                    d="M8 6V4c0-1.1.9-2 2-2h4a2 2 0 012 2v2h5a1 1 0 010 2h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V8H3a1 1 0 110-2h5zM6 8v12h12V8H6zm8-2V4h-4v2h4zm-4 4a1 1 0 011 1v6a1 1 0 01-2 0v-6a1 1 0 011-1zm4 0a1 1 0 011 1v6a1 1 0 01-2 0v-6a1 1 0 011-1z"
+                      d="M8 6V4c0-1.1.9-2 2-2h4a2 2 0 012 2v2h5a1 1 0 010 2h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V8H3a1 1 0 110-2h5zM6 8v12h12V8H6zm8-2V4h-4v2h4zm-4 4a1 1 0 011 1v6a1 1 0 01-2 0v-6a1 1 0 011-1zm4 0a1 1 0 011 1v6a1 1 0 01-2 0v-6a1 1 0 011-1z"
                   />
                 </svg>
               </div>
@@ -83,11 +85,11 @@
         </draggable>
 
         <DefaultButton
-          v-if="canAddRows"
-          @click="addRow"
-          class="add-button btn btn-default btn-primary"
-          :class="{ 'delete-width': canDeleteRows, 'mt-3': rows.length }"
-          type="button"
+            v-if="canAddRows"
+            @click="addRow"
+            class="add-button btn btn-default btn-primary"
+            :class="{ 'delete-width': canDeleteRows, 'mt-3': rows.length }"
+            type="button"
         >
           {{ field.addRowLabel }}
         </DefaultButton>
@@ -98,15 +100,15 @@
 
 <script>
 import Draggable from 'vuedraggable';
-import { Errors } from 'form-backend-validation';
-import { FormField, HandlesValidationErrors, DependentFormField } from 'laravel-nova';
+import {Errors} from 'form-backend-validation';
+import {DependentFormField, FormField, HandlesValidationErrors} from 'laravel-nova';
 import HandlesRepeatable from '../mixins/HandlesRepeatable';
 import _set from 'lodash/set';
 
 export default {
   mixins: [FormField, HandlesValidationErrors, HandlesRepeatable, DependentFormField],
 
-  components: { Draggable },
+  components: {Draggable},
 
   props: ['resourceName', 'resourceId', 'field'],
 
@@ -181,7 +183,6 @@ export default {
     },
 
     addRow() {
-      console.log('works')
       this.rows.push(this.copyFields(this.field.fields, this.rows.length));
     },
 
@@ -210,7 +211,7 @@ export default {
 
         // Find all errors related to this field
         const relatedErrors = Object.keys(errors).filter(
-          err => !!err.match(new RegExp(`^${safeRepeaterAttr}.\\d+.${fieldAttr}`))
+            err => !!err.match(new RegExp(`^${safeRepeaterAttr}.\\d+.${fieldAttr}`))
         );
 
         const isTranslatable = field.component === 'translatable-field';
