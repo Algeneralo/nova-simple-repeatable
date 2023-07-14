@@ -36,9 +36,11 @@ class SimpleRepeatableServiceProvider extends ServiceProvider
         Route::group([
             'domain' => config('nova.domain', null),
             'middleware' => 'nova:api',
+            'prefix' => '/nova-api',
             'excluded_middleware' => [SubstituteBindings::class],
         ], function () {
-            Route::patch('/nova-api/{resource}/creation-fields', CreationFieldSyncController::class);
+            Route::patch('/{resource}/creation-fields', CreationFieldSyncController::class);
+            Route::patch('/{resource}/{resourceId}/update-fields', [UpdateFieldController::class, 'sync']);
         });
     }
 
