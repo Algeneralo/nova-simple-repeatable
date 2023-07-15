@@ -27,36 +27,45 @@ class UpdateFieldController extends BaseUpdateFieldController
      */
     public function sync(ResourceUpdateOrUpdateAttachedRequest $request)
     {
-        $resource = UpdateViewResource::make()->newResourceWith($request);
 
         $field = $request->query('field');
         if (str_contains($field, '---')) {
-            [$repeatableField, $field] = explode('---', $field);
-            $repeatableField = $resource->updateFields($request)
-                ->filter(function ($field) use ($repeatableField, $request) {
-                    return $repeatableField === $field->attribute;
-                })->firstOrFail();
-            foreach ($request->all() as $key => $value) {
-                if (str_contains($key, '---')) {
-                    $key = explode('---', $key)[1] ?? $key;
-                    $request->merge([
-                        "$key" => $value,
-                    ]);
-                }
+            $array = $request->except([
+                'editing', 'editMode', 'field', 'component', $request->query('field'),
+            ]);
+            $key = $request->query('component').'-'.reset($array) ?? 'null';
+            $sync_depends_on = \Cache::driver('file')->remember($key, now()->addMinute(),
+                function () use ($request, $field) {
+                    $resource = UpdateViewResource::make()->newResourceWith($request);
+                    [$repeatableField, $field] = explode('---', $field);
+                    $repeatableField = $resource->updateFields($request)
+                        ->filter(function ($field) use ($repeatableField, $request) {
+                            return $repeatableField === $field->attribute;
+                        })->firstOrFail();
+                    foreach ($request->all() as $key => $value) {
+                        if (str_contains($key, '---')) {
+                            $key = explode('---', $key)[1] ?? $key;
+                            $request->merge([
+                                "$key" => $value,
+                            ]);
+                        }
 
-            }
-            $sync_depends_on = $repeatableField->fields->findFieldByAttribute($field)->syncDependsOn($request);
-            $sync_depends_on->attribute = $request->query('field');
-            $sync_depends_on->dependentComponentKey = $request->query('component');
+                    }
+                    $sync_depends_on = $repeatableField->fields->findFieldByAttribute($field)->syncDependsOn($request);
+                    $sync_depends_on->attribute = $request->query('field');
+                    $sync_depends_on->dependentComponentKey = $request->query('component');
 
-            return response()->json($sync_depends_on);
+                    return json_encode($sync_depends_on);
+                });
+            return response($sync_depends_on);
         }
+        $resource = UpdateViewResource::make()->newResourceWith($request);
 
         return response()->json(
             $resource->updateFields($request)
                 ->filter(function ($field) use ($request) {
                     return $request->query('field') === $field->attribute &&
-                            $request->query('component') === $field->dependentComponentKey();
+                        $request->query('component') === $field->dependentComponentKey();
                 })->each->syncDependsOn($request)
                 ->first()
         );
