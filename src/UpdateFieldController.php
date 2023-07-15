@@ -34,7 +34,7 @@ class UpdateFieldController extends BaseUpdateFieldController
                 'editing', 'editMode', 'field', 'component', $request->query('field'),
             ]);
             $key = $request->query('component').'-'.reset($array) ?? 'null';
-            $sync_depends_on = \Cache::driver('file')->remember($key, now()->addMinute(),
+            $sync_depends_on = \Cache::driver('file')->remember($key, now()->addSeconds(40),
                 function () use ($request, $field) {
                     $resource = UpdateViewResource::make()->newResourceWith($request);
                     [$repeatableField, $field] = explode('---', $field);
