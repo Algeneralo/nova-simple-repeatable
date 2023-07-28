@@ -183,7 +183,7 @@ export default {
     },
 
     addRow() {
-      this.rows.push(this.copyFields(this.field.fields, this.rows.length));
+      this.rows.push(this.copyFields(this.field.fields, this.rows.length, true));
     },
 
     deleteRow(index) {

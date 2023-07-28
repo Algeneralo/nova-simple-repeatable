@@ -41,7 +41,7 @@ export default {
       }
     },
 
-    copyFields(fields, rowIndex = void 0) {
+    copyFields(fields, rowIndex = void 0, isNew = false) {
       if (!rowIndex) rowIndex = this.rows.length;
 
       // Return an array of fields with unique attribute
@@ -59,11 +59,14 @@ export default {
             }, {})
             : {};
         let extraAttributes = field.extraAttributes;
-        extraAttributes.readonly = false;
+        if (extraAttributes && isNew) {
+          extraAttributes.readonly = false;
+        }
+        let readonly = isNew ? false : field.readonly;
         return {
           ...field,
            dependsOn: dependsOn,
-          readonly: false,
+          readonly: readonly,
           extraAttributes: extraAttributes,
           originalAttribute: field.attribute,
           validationKey: uniqueAttribute,
