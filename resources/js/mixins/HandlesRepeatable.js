@@ -58,9 +58,13 @@ export default {
               return acc;
             }, {})
             : {};
+        let extraAttributes = field.extraAttributes;
+        extraAttributes.readonly = false;
         return {
           ...field,
            dependsOn: dependsOn,
+          readonly: false,
+          extraAttributes: extraAttributes,
           originalAttribute: field.attribute,
           validationKey: uniqueAttribute,
           attribute: uniqueAttribute,
